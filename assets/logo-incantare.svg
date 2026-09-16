@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 150" role="img" aria-labelledby="incantareLogoTitle">
+  <title id="incantareLogoTitle">Incantare Centro Estético</title>
+  <!--
+    Logotipo redesenhado em SVG (vetor leve, sem requisição de imagem externa)
+    a partir da referência visual enviada pelo cliente.
+    Para usar o arquivo oficial em PNG, basta substituir as referências
+    a "logo-incantare.svg" no HTML por "logo-incantare.png" nesta mesma pasta.
+  -->
+  <g fill="none" stroke="currentColor" stroke-width="2.2">
+    <ellipse cx="52" cy="75" rx="34" ry="58"></ellipse>
+    <path d="M 52 20 C 30 45, 30 105, 52 130 C 74 105, 74 45, 52 20 Z"></path>
+    <path d="M 20 75 C 45 53, 59 53, 84 75 C 59 97, 45 97, 20 75 Z"></path>
+  </g>
+  <g fill="currentColor">
+    <rect x="48" y="58" width="8" height="34"></rect>
+    <rect x="40" y="58" width="24" height="4"></rect>
+    <rect x="40" y="88" width="24" height="4"></rect>
+  </g>
+  <text x="122" y="68" font-family="Georgia, 'Times New Roman', serif" font-size="46" letter-spacing="10" fill="currentColor">INCANTARE</text>
+  <text x="124" y="100" font-family="Georgia, 'Times New Roman', serif" font-size="16" letter-spacing="7" fill="currentColor" opacity="0.78">CENTRO ESTÉTICO</text>
+</svg>

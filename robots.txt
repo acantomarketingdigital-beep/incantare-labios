@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://incantare.com.br/sitemap.xml
