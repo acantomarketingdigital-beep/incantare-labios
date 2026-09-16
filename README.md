@@ -22,7 +22,8 @@ netlify.toml
 robots.txt
 sitemap.xml
 /assets
-  logo-incantare.svg     ← logotipo (ver nota abaixo)
+  logo-incantare.png          ← logotipo oficial, otimizado p/ web (900px)
+  logo-incantare-oficial.png  ← arquivo original enviado pelo cliente (fonte)
   antes-depois-01.webp … antes-depois-05.webp
   og-image.jpg
   favicon-16.png / favicon-32.png / favicon.ico
@@ -32,13 +33,14 @@ sitemap.xml
 
 ### Sobre o logotipo
 
-O arquivo `assets/logo-incantare.svg` é uma **reconstrução em vetor**
-do logotipo enviado (o Claude Code não tem acesso a imagens coladas
-diretamente na conversa como arquivo). Para usar o arquivo oficial:
-
-1. Salve o PNG/SVG original em `assets/logo-incantare.png` (ou `.svg`).
-2. No `index.html`, troque as duas ocorrências de
-   `src="assets/logo-incantare.svg"` pelo novo caminho.
+`assets/logo-incantare.png` é o logotipo **oficial** da Incantare
+(enviado pelo cliente), redimensionado para 900px de largura e
+otimizado para web (~55KB). O arquivo original em alta resolução
+(6616px) fica em `assets/logo-incantare-oficial.png`, mantido só como
+fonte — se precisar reexportar em outro tamanho, reprocesse a partir
+dele. Os favicons (`favicon-*.png`, `apple-touch-icon.png`,
+`icon-192/512.png`) também já foram recortados a partir do emblema
+real (o "I" dentro do oval).
 
 ### Sobre as imagens de antes e depois
 
@@ -46,9 +48,7 @@ As 5 imagens em `/assets/antes-depois-0X.webp` já vieram com a marca
 d'água da Incantare aplicada e foram apenas redimensionadas e
 convertidas para WebP (redução de ~8,8 MB para ~0,28 MB no total,
 mantendo a marca d'água original). Elas são representações geradas
-para fins publicitários — por isso a página exibe o aviso
-"Imagens ilustrativas. Resultados podem variar conforme cada caso."
-abaixo do carrossel.
+para fins publicitários.
 
 Para substituir por fotos reais de pacientes (com autorização), basta
 sobrescrever os arquivos `antes-depois-01.webp` a `antes-depois-05.webp`
