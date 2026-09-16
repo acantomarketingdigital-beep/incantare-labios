@@ -1,20 +1,22 @@
 /* ================================================================
    INCANTARE CENTRO ESTÉTICO — Preenchimento Labial
-   script.js — tracking (dataLayer), quiz, carrossel, FAQ,
-   modais, banner de cookies (LGPD / Consent Mode) e WhatsApp.
+   Campanha exclusiva Meta Ads (sem Google Ads).
+   script.js — tracking (dataLayer + Meta Pixel), quiz, carrossel
+   autoplay, modais, banner de cookies (LGPD / Consent Mode) e
+   WhatsApp.
 
    ------------------------------------------------------------
-   MAPEAMENTO DE EVENTOS PARA O GOOGLE TAG MANAGER
-   (configuração real das tags é feita depois, dentro do GTM;
-   aqui só garantimos que o dataLayer recebe os eventos certos)
+   MAPEAMENTO DE EVENTOS
+   (dataLayer + fbq disparados diretamente; GTM/GA4 são opcionais
+   e podem ser conectados depois sem duplicar os eventos do Pixel)
 
-     lp_view            → GA4: page_view/evento complementar | META: PageView
-     offer_view         → GA4: offer_view                    | META: ViewContent
-     quiz_start         → GA4: quiz_start                    | META: QuizStart (custom)
-     quiz_answer        → GA4: quiz_answer (evento auxiliar)
-     quiz_complete       → GA4: quiz_complete                | META: QuizComplete (custom)
-     qualified_interest → GA4: qualify_lead                  | META: QualifiedInterest (custom)
-     whatsapp_click      → GA4: whatsapp_click                | META: Contact
+     lp_view          → dataLayer                | META Pixel: PageView (base code)
+     offer_view       → dataLayer                | -
+     quiz_start       → dataLayer 'quiz_start'    | META: fbq('trackCustom', 'QuizStart')  — 1x/sessão
+     quiz_answer      → dataLayer (auxiliar, por etapa)
+     lead             → dataLayer 'lead'          | META: fbq('track', 'Lead')             — 1x, só ao completar o quiz
+     whatsapp_contact → dataLayer 'whatsapp_contact' | META: fbq('track', 'Contact')        — 1x, clique final no WhatsApp
+     agency_footer_click → dataLayer (isolado, fora do funil da Incantare)
 
    Ver tabela completa em README.md.
    ------------------------------------------------------------
@@ -72,6 +74,14 @@
     );
   }
 
+  // Dispara o Meta Pixel com segurança — não quebra se o Pixel
+  // ainda não estiver configurado (fbq indefinido).
+  function fbqSafe() {
+    if (typeof window.fbq === 'function') {
+      window.fbq.apply(window, arguments);
+    }
+  }
+
   /* ============================================================
      UTM — captura e persistência durante a sessão
      (armazenados apenas como parâmetros NÃO pessoais de campanha)
@@ -127,41 +137,40 @@
     resultAnswerCode: null,
     resultAnswerLabel: null,
     timeframeCode: null,
-    timeframeLabel: null,
-    intentLevel: null // 'high' | 'low'
+    timeframeLabel: null
   };
 
   /* ============================================================
      MENSAGEM E LINK DO WHATSAPP
+     O botão de WhatsApp só fica acessível DEPOIS do quiz completo
+     (não existe CTA de WhatsApp antes disso na página), então
+     firstName/resultAnswerLabel/timeframeLabel sempre já existem
+     quando esta mensagem é montada.
      ============================================================ */
 
   function buildWhatsappMessage() {
-    var lines = [];
-
-    lines.push(quizState.firstName ? 'Olá! Meu nome é ' + quizState.firstName + '.' : 'Olá!');
-    lines.push('Vim pela campanha de preenchimento labial da Incantare.');
-
-    if (quizState.resultAnswerLabel || quizState.timeframeLabel) {
-      lines.push('');
-      if (quizState.resultAnswerLabel) lines.push('Estou buscando: ' + quizState.resultAnswerLabel);
-      if (quizState.timeframeLabel) lines.push('Pretendo realizar: ' + quizState.timeframeLabel);
-    }
-
-    lines.push('');
-    lines.push('Quero saber qual é a condição especial do preenchimento labial.');
-
-    return lines.join('\n');
+    return [
+      'Olá! Meu nome é ' + quizState.firstName + '.',
+      '',
+      'Vi a promoção de Preenchimento Labial da Incantare e gostaria de saber qual é a condição especial.',
+      '',
+      'Meu objetivo é:',
+      quizState.resultAnswerLabel,
+      '',
+      'Pretendo realizar:',
+      quizState.timeframeLabel,
+      '',
+      'Gostaria de receber mais informações.'
+    ].join('\n');
   }
 
-  function openWhatsapp(position) {
+  function openWhatsapp() {
     var message = buildWhatsappMessage();
     var url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(message);
     var isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    trackEvent('whatsapp_click', {
-      intent_level: quizState.intentLevel || 'unknown',
-      cta_position: position
-    });
+    trackEvent('whatsapp_contact');
+    fbqSafe('track', 'Contact');
 
     // Pequeno delay para aumentar a chance de a tag ser enviada
     // antes da navegação para o WhatsApp.
@@ -176,14 +185,15 @@
 
   function initWhatsappButtons() {
     document.querySelectorAll('[data-whatsapp-cta]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        openWhatsapp(btn.getAttribute('data-cta-position') || 'unknown');
-      });
+      btn.addEventListener('click', openWhatsapp);
     });
   }
 
   /* ============================================================
-     HERO — CTA principal (rola até o quiz + quiz_start)
+     CTAs "descobrir a condição" (hero + abaixo do carrossel)
+     Ambos levam ao quiz e disparam quiz_start — só 1x por sessão,
+     não importa qual dos dois botões foi clicado primeiro.
+     Não existe nenhum botão de WhatsApp antes do quiz completo.
      ============================================================ */
 
   var quizStartFired = false;
@@ -201,15 +211,17 @@
     }
     quizStartFired = true;
     trackEvent('quiz_start');
+    fbqSafe('trackCustom', 'QuizStart');
   }
 
-  function initHeroCta() {
-    var btn = document.getElementById('ctaHeroQuiz');
+  function initQuizCtas() {
     var quizSection = document.getElementById('quiz');
-    btn.addEventListener('click', function () {
+    function goToQuiz() {
       fireQuizStartOnce();
       quizSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
+    }
+    document.getElementById('ctaHeroQuiz').addEventListener('click', goToQuiz);
+    document.getElementById('ctaGalleryQuiz').addEventListener('click', goToQuiz);
   }
 
   function initOfferView() {
@@ -232,24 +244,6 @@
     observer.observe(hero);
   }
 
-  function initStickyCta() {
-    var sticky = document.getElementById('stickyCta');
-    var hero = document.getElementById('hero');
-    if (!('IntersectionObserver' in window)) {
-      sticky.classList.add('is-visible');
-      return;
-    }
-    var observer = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          sticky.classList.toggle('is-visible', !entry.isIntersecting);
-        });
-      },
-      { threshold: 0 }
-    );
-    observer.observe(hero);
-  }
-
   /* ============================================================
      QUIZ — 3 etapas, sem recarregar a página
      ============================================================ */
@@ -261,8 +255,11 @@
     var target = document.querySelector('.quiz-step[data-step="' + stepNumber + '"]');
     if (target) target.hidden = false;
 
-    document.getElementById('quizProgressFill').style.width = (stepNumber / 3) * 100 + '%';
-    document.getElementById('quizProgressLabel').textContent = stepNumber + ' de 3';
+    document.querySelectorAll('.progress-dot').forEach(function (dot) {
+      var dotStep = Number(dot.getAttribute('data-progress-dot'));
+      dot.classList.toggle('is-filled', dotStep <= stepNumber);
+    });
+    document.getElementById('quizProgressLabel').textContent = 'Etapa ' + stepNumber + ' de 3';
   }
 
   function selectOption(selectedBtn, scopeSelector) {
@@ -335,21 +332,9 @@
           answer_code: quizState.timeframeCode
         });
 
-        var isHighIntent = quizState.timeframeCode === 'agora' || quizState.timeframeCode === '30_dias';
-        quizState.intentLevel = isHighIntent ? 'high' : 'low';
-
-        trackEvent('quiz_complete', {
-          intent_level: quizState.intentLevel
-        });
-
-        // Regra de qualificação: só dispara qualified_interest
-        // para "agora" ou "30_dias". "pesquisando" não qualifica.
-        if (isHighIntent) {
-          trackEvent('qualified_interest', {
-            intent_level: 'high',
-            timeframe: quizState.timeframeCode
-          });
-        }
+        // Quiz completo: dispara Lead (1x) — só agora, nunca antes.
+        trackEvent('lead');
+        fbqSafe('track', 'Lead');
 
         window.setTimeout(showQuizResult, 320);
       });
@@ -357,16 +342,21 @@
   }
 
   /* ============================================================
-     CARROSSEL — Antes e Depois
+     CARROSSEL — Antes e Depois (autoplay + swipe/setas/pontos)
      ============================================================ */
 
   function initCarousel() {
+    var AUTOPLAY_MS = 2800;
+    var RESUME_DELAY_MS = 5000;
+
     var track = document.getElementById('carouselTrack');
     var slides = Array.prototype.slice.call(track.children);
     var dotsContainer = document.getElementById('carouselDots');
     var prevBtn = document.getElementById('carouselPrev');
     var nextBtn = document.getElementById('carouselNext');
     var currentIndex = 0;
+    var autoplayTimer = null;
+    var resumeTimer = null;
 
     slides.forEach(function (_, index) {
       var dot = document.createElement('button');
@@ -375,6 +365,7 @@
       dot.setAttribute('aria-label', 'Ir para imagem ' + (index + 1));
       dot.addEventListener('click', function () {
         scrollToSlide(index);
+        pauseAndScheduleResume();
       });
       dotsContainer.appendChild(dot);
     });
@@ -389,6 +380,24 @@
     function scrollToSlide(index) {
       var slide = slides[index];
       track.scrollTo({ left: slide.offsetLeft, behavior: 'smooth' });
+    }
+
+    function startAutoplay() {
+      stopAutoplay();
+      autoplayTimer = window.setInterval(function () {
+        scrollToSlide((currentIndex + 1) % slides.length);
+      }, AUTOPLAY_MS);
+    }
+
+    function stopAutoplay() {
+      if (autoplayTimer) window.clearInterval(autoplayTimer);
+      autoplayTimer = null;
+    }
+
+    function pauseAndScheduleResume() {
+      stopAutoplay();
+      if (resumeTimer) window.clearTimeout(resumeTimer);
+      resumeTimer = window.setTimeout(startAutoplay, RESUME_DELAY_MS);
     }
 
     if ('IntersectionObserver' in window) {
@@ -413,35 +422,27 @@
 
     prevBtn.addEventListener('click', function () {
       scrollToSlide(Math.max(0, currentIndex - 1));
+      pauseAndScheduleResume();
     });
     nextBtn.addEventListener('click', function () {
       scrollToSlide(Math.min(slides.length - 1, currentIndex + 1));
+      pauseAndScheduleResume();
+    });
+
+    // Toque/arraste no carrossel pausa o autoplay e retoma depois.
+    track.addEventListener('pointerdown', pauseAndScheduleResume);
+    track.addEventListener('touchstart', pauseAndScheduleResume, { passive: true });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        stopAutoplay();
+      } else {
+        startAutoplay();
+      }
     });
 
     setActiveDot(0);
-  }
-
-  /* ============================================================
-     FAQ — Accordion
-     ============================================================ */
-
-  function initAccordion() {
-    var items = document.querySelectorAll('.accordion-item');
-    items.forEach(function (item) {
-      var trigger = item.querySelector('.accordion-trigger');
-      var panel = item.querySelector('.accordion-panel');
-      trigger.addEventListener('click', function () {
-        var isOpen = trigger.getAttribute('aria-expanded') === 'true';
-        items.forEach(function (other) {
-          other.querySelector('.accordion-trigger').setAttribute('aria-expanded', 'false');
-          other.querySelector('.accordion-panel').hidden = true;
-        });
-        if (!isOpen) {
-          trigger.setAttribute('aria-expanded', 'true');
-          panel.hidden = false;
-        }
-      });
-    });
+    startAutoplay();
   }
 
   /* ============================================================
@@ -515,23 +516,6 @@
     var saveBtn = document.getElementById('cookieSavePrefs');
     var analyticsCheckbox = document.getElementById('cookieAnalytics');
     var marketingCheckbox = document.getElementById('cookieMarketing');
-    var sticky = document.getElementById('stickyCta');
-
-    // O banner de cookies e o CTA sticky são ambos fixos no rodapé.
-    // Enquanto o banner estiver visível (inclusive com o painel
-    // "Configurar" aberto, que aumenta a altura), o sticky sobe para
-    // não ficar coberto/inclicável atrás do banner.
-    if ('ResizeObserver' in window) {
-      var stickyObserver = new ResizeObserver(function () {
-        if (!banner.hidden) {
-          sticky.style.setProperty('--cookie-banner-h', banner.offsetHeight + 'px');
-          sticky.classList.add('is-above-cookie-banner');
-        } else {
-          sticky.classList.remove('is-above-cookie-banner');
-        }
-      });
-      stickyObserver.observe(banner);
-    }
 
     var stored = null;
     try {
@@ -612,12 +596,10 @@
 
   trackEvent('lp_view');
 
-  initHeroCta();
+  initQuizCtas();
   initOfferView();
-  initStickyCta();
   initQuiz();
   initCarousel();
-  initAccordion();
   initModals();
   initCookieConsent();
   initWhatsappButtons();

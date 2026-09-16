@@ -1,13 +1,13 @@
 # Incantare Centro Estético — Landing Page Preenchimento Labial
 
-Landing page mobile-first, extremamente rápida e focada em conversão para a
-campanha de **preenchimento labial** da Incantare Centro Estético. HTML, CSS
-e JavaScript puro — sem frameworks, sem build step, pronta para deploy na
-Netlify.
+Landing page **mobile-first**, curta e de alta conversão, feita
+**exclusivamente para tráfego pago do Meta Ads** (Instagram/Facebook —
+não é usada para Google Ads). HTML, CSS e JavaScript puro — sem
+frameworks, sem build step, pronta para deploy na Netlify ou Vercel.
 
-O preço nunca é revelado na página. A oferta trabalha curiosidade
-("condição nunca vista", "valor especial") e conduz o visitante por um
-quiz de 3 perguntas até o CTA de WhatsApp.
+Fluxo: **anúncio → hero promocional → antes/depois → quiz de 3 etapas
+→ WhatsApp**. O preço nunca é revelado na página — a oferta trabalha
+curiosidade ("condição nunca vista") e qualificação rápida via quiz.
 
 ---
 
@@ -37,7 +37,7 @@ do logotipo enviado (o Claude Code não tem acesso a imagens coladas
 diretamente na conversa como arquivo). Para usar o arquivo oficial:
 
 1. Salve o PNG/SVG original em `assets/logo-incantare.png` (ou `.svg`).
-2. No `index.html`, troque as três ocorrências de
+2. No `index.html`, troque as duas ocorrências de
    `src="assets/logo-incantare.svg"` pelo novo caminho.
 
 ### Sobre as imagens de antes e depois
@@ -56,33 +56,54 @@ mantendo o mesmo nome e proporção (1:1).
 
 ---
 
-## Configuração obrigatória antes do deploy
+## Estrutura da página (somente isso, de propósito)
 
-1. **Número de WhatsApp** — em `script.js`, defina:
-   ```js
-   var WHATSAPP_NUMBER = '55DDDNUMERO'; // formato: 55 + DDD + número
-   ```
-2. **Domínio canônico** — em `index.html`, ajuste `<link rel="canonical">`,
-   `og:url` e, em `robots.txt`/`sitemap.xml`, o domínio final.
-3. **Google Tag Manager** — insira o snippet do GTM:
-   - no `<head>`, logo após o bloco `<script>` que inicializa o
-     `dataLayer` (marcado com o comentário `INSERIR AQUI O SNIPPET DO
-     GOOGLE TAG MANAGER`);
-   - o `<noscript>` do GTM logo após a abertura do `<body>` (comentário
-     equivalente já indicado no HTML).
-   - Configure o **Consent Mode** no próprio GTM usando os eventos
-     `default_consent` e `consent_update` já disparados pela página
-     (ver seção LGPD abaixo).
+1. Hero promocional (logo pequena + "CONDIÇÃO NUNCA VISTA" + CTA)
+2. Antes e depois (carrossel automático + CTA)
+3. Quiz de 3 etapas
+4. WhatsApp (único ponto de saída — só aparece depois do quiz completo)
+5. Rodapé Incantare (compacto)
+6. Assinatura Adriano Marketing (discreta, separada por divisor)
+
+Sem menu, sem FAQ, sem seção de benefícios/institucional, sem botão
+flutuante de WhatsApp e sem nenhum CTA de WhatsApp antes do quiz —
+isso é proposital: a página existe para converter tráfego de anúncio
+rápido, não para explicar a clínica.
 
 ---
 
-## Deploy na Netlify
+## Configuração obrigatória antes do deploy
 
-1. Suba esta pasta para um repositório Git (GitHub/GitLab/Bitbucket).
-2. Na Netlify: **Add new site → Import an existing project**.
-3. Build command: (vazio — não há build).
-4. Publish directory: `.`
-5. Deploy. O `netlify.toml` já define headers de cache e segurança.
+1. **Número de WhatsApp da Incantare** — em `script.js`:
+   ```js
+   var WHATSAPP_NUMBER = '55DDDNUMERO'; // formato: 55 + DDD + número
+   ```
+2. **Meta Pixel** — em `index.html`, substitua as duas ocorrências de
+   `SEU_PIXEL_ID` (no `<script>` do Pixel e no `<noscript>` logo abaixo)
+   pelo Pixel ID real da Incantare. Sem isso, `fbq(...)` simplesmente
+   não faz nada (chamadas protegidas por `fbqSafe()` em `script.js`,
+   não geram erro no console).
+3. **Domínio canônico** — em `index.html`, ajuste `<link rel="canonical">`,
+   `og:url` e, em `robots.txt`/`sitemap.xml`, o domínio final.
+4. **Google Tag Manager (opcional)** — insira o snippet do GTM:
+   - no `<head>`, logo após o bloco `<script>` que inicializa o
+     `dataLayer` (comentário `INSERIR AQUI O SNIPPET DO GOOGLE TAG
+     MANAGER`);
+   - o `<noscript>` do GTM logo após a abertura do `<body>` (comentário
+     equivalente já indicado no HTML).
+   - Os eventos do dataLayer já existem independente do GTM — o GTM é
+     só um consumidor opcional deles (ex.: para espelhar em GA4).
+
+---
+
+## Deploy
+
+**Netlify:** suba a pasta para um repositório Git → *Add new site →
+Import an existing project* → build command vazio, publish directory
+`.` → Deploy (`netlify.toml` já define headers de cache/segurança).
+
+**Vercel:** *Add New → Project → Import Git Repository* → Framework
+"Other" (site estático, sem build) → Deploy.
 
 ---
 
@@ -93,50 +114,55 @@ mantendo o mesmo nome e proporção (1:1).
 - O banner de cookies (rodapé, discreto) permite **Aceitar** tudo ou
   **Configurar** Analytics e Marketing separadamente.
 - Qualquer escolha dispara `consent_update` no dataLayer com
-  `analytics_storage` e `ad_storage` (`granted`/`denied`), para que o
-  GTM libere (ou não) as tags conforme configurado nas suas próprias
-  configurações de consentimento.
+  `analytics_storage` e `ad_storage` (`granted`/`denied`).
 - A escolha fica salva em `localStorage` — o banner não é mostrado de
   novo em visitas futuras no mesmo navegador.
+- O Meta Pixel base já dispara `PageView` independentemente do banner
+  (comportamento padrão do Pixel); ajuste isso nas configurações de
+  consentimento do Gerenciador de Eventos da Meta caso precise
+  condicionar ao aceite de cookies de marketing.
 
 ---
 
-## Dados pessoais — o que NUNCA vai para o dataLayer
+## Dados pessoais — o que NUNCA vai para o dataLayer/Pixel
 
 Nome, telefone, e-mail, CPF ou qualquer identificador pessoal **não**
-são enviados a nenhum evento de analytics. O primeiro nome informado
+são enviados a nenhum evento de tracking. O primeiro nome informado
 no quiz fica apenas em memória no JavaScript da página, usado só para
 personalizar a tela de resultado e a mensagem pré-preenchida do
 WhatsApp.
 
 ---
 
-## Tabela de eventos para configuração no GTM
+## Tabela de eventos
 
-| Evento | Quando dispara | Parâmetros principais | Tag GA4 sugerida | Tag Meta sugerida |
+| Evento | Quando dispara | Parâmetros principais | dataLayer | Meta Pixel |
 |---|---|---|---|---|
-| `lp_view` | No carregamento da página | `procedure`, `funnel`, `clinic`, `page_variant`, `traffic_source`*, `campaign_name`*, `event_id` | `page_view` (ou evento complementar `lp_view`) | `PageView` |
-| `offer_view` | Quando o Hero entra na viewport (dispara 1x) | mesmos parâmetros base | `offer_view` | `ViewContent` |
-| `quiz_start` | Clique em "QUERO DESCOBRIR A CONDIÇÃO" (1x por sessão) | mesmos parâmetros base | `quiz_start` | Evento customizado `QuizStart` |
-| `quiz_answer` | Ao responder a pergunta 2 ou 3 do quiz | `quiz_step` (2 ou 3), `answer_code` (`natural`/`volume`/`definicao` ou `agora`/`30_dias`/`pesquisando`) | `quiz_answer` (evento auxiliar) | Evento customizado `QuizAnswer` (opcional) |
-| `quiz_complete` | Logo após responder a pergunta 3 | `intent_level` (`high`/`low`) | `quiz_complete` | Evento customizado `QuizComplete` |
-| `qualified_interest` | Somente se a resposta 3 for `agora` ou `30_dias` | `intent_level: "high"`, `timeframe` | `qualify_lead` | Evento customizado `QualifiedInterest` |
-| `whatsapp_click` | Clique em qualquer botão de WhatsApp, antes de abrir o link | `intent_level`, `cta_position` (`hero`/`gallery`/`quiz_result`/`footer`/`sticky`) | `whatsapp_click` | `Contact` |
-| `lead_submit` *(futuro)* | Só quando existir envio real de formulário com telefone/contato confirmado — **não** disparar apenas por abrir o quiz | a definir | `generate_lead` | `Lead` |
+| `lp_view` | No carregamento da página | `procedure`, `clinic`, `funnel`, `event_id`, UTMs* | `lp_view` | `PageView` (código base do Pixel, automático) |
+| `offer_view` | Quando o Hero entra na viewport (1x) | mesmos parâmetros base | `offer_view` | — |
+| `quiz_start` | Primeiro clique em "QUERO DESCOBRIR A CONDIÇÃO" (hero ou abaixo do carrossel) — 1x por sessão | mesmos parâmetros base | `quiz_start` | `fbq('trackCustom', 'QuizStart')` |
+| `quiz_answer` | Ao responder a etapa 2 ou 3 do quiz | `quiz_step` (2 ou 3), `answer_code` | `quiz_answer` (auxiliar) | — |
+| `lead` | Assim que a etapa 3 é respondida (quiz 100% completo) — 1x, nunca antes | mesmos parâmetros base | `lead` | `fbq('track', 'Lead')` |
+| `whatsapp_contact` | Clique no botão final "VER MINHA CONDIÇÃO NO WHATSAPP" (único CTA de WhatsApp da página) | mesmos parâmetros base | `whatsapp_contact` | `fbq('track', 'Contact')` |
 
 \* `traffic_source`, `campaign_name`, `creative_name`, `medium`, `term` e
-`click_id` são adicionados automaticamente a todo evento quando a URL
-de entrada contiver `utm_source`, `utm_campaign`, `utm_content`,
-`utm_medium`, `utm_term` ou `fbclid` (persistidos em `sessionStorage`
-durante a navegação).
+`click_id` são adicionados automaticamente a todo evento do dataLayer
+quando a URL de entrada contiver `utm_source`, `utm_campaign`,
+`utm_content`, `utm_medium`, `utm_term` ou `fbclid` (persistidos em
+`sessionStorage` durante a navegação).
 
-Todos os eventos acima passam pela função `trackEvent()` em `script.js`,
-que já inclui `event`, `procedure`, `clinic`, `funnel`, `page_variant` e
-um `event_id` único (`crypto.randomUUID()`) — não é necessário duplicar
-esses campos manualmente no GTM.
+Todos os eventos do dataLayer passam pela função `trackEvent()` em
+`script.js`, que já inclui `event`, `procedure`, `clinic`, `funnel`,
+`page_variant` e um `event_id` único (`crypto.randomUUID()`). Os
+eventos do Meta Pixel passam por `fbqSafe()`, que não faz nada (sem
+erro) enquanto o Pixel ID real não for configurado.
+
+**Códigos das respostas do quiz** (`answer_code` em `quiz_answer`):
+- Etapa 2 (objetivo): `volume` · `definicao` · `natural` · `indeciso`
+- Etapa 3 (prazo): `quanto_antes` · `proximos_dias` · `proximas_semanas` · `pesquisando`
 
 ### Evento à parte — assinatura da agência (rodapé)
 
 | Evento | Quando dispara | Parâmetros | Observação |
 |---|---|---|---|
-| `agency_footer_click` | Clique no link "Falar com o responsável por esta página" (assinatura discreta abaixo do rodapé) | `agency: "adriano_marketing"`, `source_page: "incantare_preenchimento_labial"`, `cta_position: "agency_footer"` | Disparado **fora** de `trackEvent()`, sem os campos de campanha da Incantare. **Não usar este evento para otimizar/qualificar a campanha de preenchimento labial** — é tráfego institucional da agência, não lead da clínica. |
+| `agency_footer_click` | Clique no link "Falar com o responsável por esta página" (assinatura discreta abaixo do rodapé) | `agency: "adriano_marketing"`, `source_page: "incantare_preenchimento_labial"`, `cta_position: "agency_footer"` | Disparado **fora** de `trackEvent()` e sem `fbq`, sem os campos de campanha da Incantare. **Não usar este evento para otimizar/qualificar a campanha de preenchimento labial** — é tráfego institucional da agência, não lead da clínica. |
