@@ -149,31 +149,36 @@
           <figure class="carousel-slide">
             <span class="slide-label slide-label-before">ANTES</span>
             <span class="slide-label slide-label-after">DEPOIS</span>
-            <img src="assets/antes-depois-01.webp" alt="Antes e depois do preenchimento labial — exemplo 1" width="1000" height="1000" loading="eager" fetchpriority="high">
+            <img src="assets/antes-depois-01.webp" alt="Antes e depois do preenchimento labial — exemplo 1" width="1000" height="1000" loading="eager" fetchpriority="high" class="zoomable-image">
+            <span class="zoom-hint" aria-hidden="true">🔍</span>
           </figure>
 
           <figure class="carousel-slide">
             <span class="slide-label slide-label-before">ANTES</span>
             <span class="slide-label slide-label-after">DEPOIS</span>
-            <img src="assets/antes-depois-02.webp" alt="Antes e depois do preenchimento labial — exemplo 2" width="1000" height="1000" loading="lazy">
+            <img src="assets/antes-depois-02.webp" alt="Antes e depois do preenchimento labial — exemplo 2" width="1000" height="1000" loading="lazy" class="zoomable-image">
+            <span class="zoom-hint" aria-hidden="true">🔍</span>
           </figure>
 
           <figure class="carousel-slide">
             <span class="slide-label slide-label-before">ANTES</span>
             <span class="slide-label slide-label-after">DEPOIS</span>
-            <img src="assets/antes-depois-03.webp" alt="Antes e depois do preenchimento labial — exemplo 3" width="1000" height="1000" loading="lazy">
+            <img src="assets/antes-depois-03.webp" alt="Antes e depois do preenchimento labial — exemplo 3" width="1000" height="1000" loading="lazy" class="zoomable-image">
+            <span class="zoom-hint" aria-hidden="true">🔍</span>
           </figure>
 
           <figure class="carousel-slide">
             <span class="slide-label slide-label-before">ANTES</span>
             <span class="slide-label slide-label-after">DEPOIS</span>
-            <img src="assets/antes-depois-04.webp" alt="Antes e depois do preenchimento labial — exemplo 4" width="1000" height="1000" loading="lazy">
+            <img src="assets/antes-depois-04.webp" alt="Antes e depois do preenchimento labial — exemplo 4" width="1000" height="1000" loading="lazy" class="zoomable-image">
+            <span class="zoom-hint" aria-hidden="true">🔍</span>
           </figure>
 
           <figure class="carousel-slide">
             <span class="slide-label slide-label-before">ANTES</span>
             <span class="slide-label slide-label-after">DEPOIS</span>
-            <img src="assets/antes-depois-05.webp" alt="Antes e depois do preenchimento labial — exemplo 5" width="1000" height="1000" loading="lazy">
+            <img src="assets/antes-depois-05.webp" alt="Antes e depois do preenchimento labial — exemplo 5" width="1000" height="1000" loading="lazy" class="zoomable-image">
+            <span class="zoom-hint" aria-hidden="true">🔍</span>
           </figure>
 
         </div>
@@ -328,6 +333,16 @@
     </div>
   </aside>
 </footer>
+
+<!-- ============================================================
+     LIGHTBOX — amplia a foto de antes/depois ao tocar nela
+     ============================================================ -->
+<div class="lightbox-overlay" id="imageLightbox" hidden>
+  <button type="button" class="lightbox-close" id="lightboxClose" aria-label="Fechar imagem ampliada">&times;</button>
+  <button type="button" class="lightbox-arrow lightbox-arrow-prev" id="lightboxPrev" aria-label="Imagem anterior">‹</button>
+  <img src="" alt="" id="lightboxImage" class="lightbox-image">
+  <button type="button" class="lightbox-arrow lightbox-arrow-next" id="lightboxNext" aria-label="Próxima imagem">›</button>
+</div>
 
 <!-- ============================================================
      MODAIS — Política de Privacidade / Termos de Uso

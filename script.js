@@ -440,6 +440,62 @@
       }
     });
 
+    /* ----------------------------------------------------------
+       LIGHTBOX — amplia a foto tocada para ver os detalhes
+       ---------------------------------------------------------- */
+    var lightbox = document.getElementById('imageLightbox');
+    var lightboxImg = document.getElementById('lightboxImage');
+    var lightboxIndex = 0;
+    var images = slides.map(function (slide) {
+      return slide.querySelector('img');
+    });
+
+    function showLightboxImage(index) {
+      lightboxIndex = (index + images.length) % images.length;
+      var img = images[lightboxIndex];
+      lightboxImg.src = img.currentSrc || img.src;
+      lightboxImg.alt = img.alt;
+    }
+
+    function openLightbox(index) {
+      stopAutoplay();
+      showLightboxImage(index);
+      lightbox.hidden = false;
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.hidden = true;
+      document.body.style.overflow = '';
+      pauseAndScheduleResume();
+    }
+
+    slides.forEach(function (slide, index) {
+      var img = slide.querySelector('.zoomable-image');
+      img.addEventListener('click', function () {
+        openLightbox(index);
+      });
+    });
+
+    document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+    document.getElementById('lightboxPrev').addEventListener('click', function () {
+      showLightboxImage(lightboxIndex - 1);
+    });
+    document.getElementById('lightboxNext').addEventListener('click', function () {
+      showLightboxImage(lightboxIndex + 1);
+    });
+
+    lightbox.addEventListener('click', function (e) {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (lightbox.hidden) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showLightboxImage(lightboxIndex - 1);
+      if (e.key === 'ArrowRight') showLightboxImage(lightboxIndex + 1);
+    });
+
     setActiveDot(0);
     startAutoplay();
   }

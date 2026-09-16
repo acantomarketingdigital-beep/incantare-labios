@@ -375,6 +375,24 @@ input:focus-visible {
   color: var(--color-purple-darker);
 }
 
+.zoomable-image { cursor: zoom-in; }
+
+.zoom-hint {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(59, 10, 74, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
 .carousel-arrow {
   position: absolute;
   top: 50%;
@@ -644,6 +662,63 @@ input:focus-visible {
 }
 
 .agency-signature-link:hover { color: var(--color-text); }
+
+/* ---------- Lightbox — foto ampliada do antes/depois ---------- */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: rgba(20, 4, 27, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(16px + var(--safe-top)) 16px calc(16px + var(--safe-bottom));
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-strong);
+}
+
+.lightbox-close,
+.lightbox-arrow {
+  position: fixed;
+  border: none;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--color-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-close {
+  top: calc(14px + var(--safe-top));
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  line-height: 1;
+  z-index: 1;
+}
+
+.lightbox-arrow {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.lightbox-arrow-prev { left: 10px; }
+.lightbox-arrow-next { right: 10px; }
 
 /* ---------- Modais ---------- */
 .modal-overlay {
