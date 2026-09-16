@@ -31,7 +31,7 @@
      CONFIGURAÇÃO
      ============================================================ */
 
-  var WHATSAPP_NUMBER = '5541996650381';
+  var WHATSAPP_NUMBER = '5547996650381';
 
   var PROCEDURE = 'preenchimento_labial';
   var FUNNEL = 'incantare_labios';
