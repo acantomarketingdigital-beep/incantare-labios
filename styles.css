@@ -222,7 +222,7 @@ input:focus-visible {
   justify-content: center;
 }
 
-.topbar-logo { height: 26px; width: auto; }
+.topbar-logo { height: 44px; width: auto; }
 
 /* ---------- Hero promocional ---------- */
 .hero {
@@ -584,7 +584,7 @@ input:focus-visible {
   text-align: center;
 }
 
-.footer-logo { height: 24px; width: auto; margin: 0 auto 12px; }
+.footer-logo { height: 36px; width: auto; margin: 0 auto 14px; }
 
 .footer-disclaimer {
   font-size: 0.78rem;

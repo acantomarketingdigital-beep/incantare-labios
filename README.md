@@ -72,27 +72,21 @@ rápido, não para explicar a clínica.
 
 ---
 
-## Configuração obrigatória antes do deploy
+## Configuração — status atual
 
-1. **Número de WhatsApp da Incantare** — em `script.js`:
-   ```js
-   var WHATSAPP_NUMBER = '55DDDNUMERO'; // formato: 55 + DDD + número
-   ```
-2. **Meta Pixel** — em `index.html`, substitua as duas ocorrências de
-   `SEU_PIXEL_ID` (no `<script>` do Pixel e no `<noscript>` logo abaixo)
-   pelo Pixel ID real da Incantare. Sem isso, `fbq(...)` simplesmente
-   não faz nada (chamadas protegidas por `fbqSafe()` em `script.js`,
-   não geram erro no console).
-3. **Domínio canônico** — em `index.html`, ajuste `<link rel="canonical">`,
-   `og:url` e, em `robots.txt`/`sitemap.xml`, o domínio final.
-4. **Google Tag Manager (opcional)** — insira o snippet do GTM:
-   - no `<head>`, logo após o bloco `<script>` que inicializa o
-     `dataLayer` (comentário `INSERIR AQUI O SNIPPET DO GOOGLE TAG
-     MANAGER`);
-   - o `<noscript>` do GTM logo após a abertura do `<body>` (comentário
-     equivalente já indicado no HTML).
-   - Os eventos do dataLayer já existem independente do GTM — o GTM é
-     só um consumidor opcional deles (ex.: para espelhar em GA4).
+1. ✅ **Número de WhatsApp da Incantare** — configurado em `script.js`
+   (`WHATSAPP_NUMBER = '5547996650381'`).
+2. ✅ **Meta Pixel** — configurado em `index.html` (Pixel ID
+   `762018213673538`, código base oficial + `PageView` automático).
+3. ✅ **Google Tag Manager** — container `GTM-PNSMTRVH` já instalado
+   (snippet no `<head>` + `<noscript>` logo após a abertura do
+   `<body>`). Os eventos do dataLayer (`lp_view`, `quiz_start`, `lead`,
+   `whatsapp_contact` etc.) já existem independente do GTM — configure
+   as tags/triggers dentro do próprio GTM usando a tabela de eventos
+   abaixo.
+4. ⏳ **Domínio canônico** — ainda placeholder. Quando o domínio final
+   for definido, ajustar `<link rel="canonical">` e `og:url` em
+   `index.html`, e a URL em `robots.txt`/`sitemap.xml`.
 
 ---
 
