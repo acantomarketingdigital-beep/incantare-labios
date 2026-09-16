@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://incantare.com.br/sitemap.xml
+Sitemap: https://labios-incantare-joinville.adrianomarketing.com/sitemap.xml
