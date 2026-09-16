@@ -31,8 +31,7 @@
      CONFIGURAÇÃO
      ============================================================ */
 
-  // TODO: substituir pelo número real do WhatsApp da clínica (formato 55DDDNUMERO)
-  var WHATSAPP_NUMBER = '55DDDNUMERO';
+  var WHATSAPP_NUMBER = '5541996650381';
 
   var PROCEDURE = 'preenchimento_labial';
   var FUNNEL = 'incantare_labios';
